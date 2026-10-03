@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>body { margin: 0; }</style>
+<title>Yoru</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=M+PLUS+Rounded+1c:wght@700;800&display=swap">
+<style>
+  /* Layout: one reading column (~46rem) in Yoru's own night palette; the overlay replica sits beside the feature list on wide screens and stacks below it on phones. */
+  :root {
+    color-scheme: dark;
+    --night: #160f2b;
+    --dusk: #201640;
+    --dusk-2: #2a1d52;
+    --line: #3a2b6b;
+    --ink: #f1ecff;
+    --ink-2: #b7a9dd;
+    --ink-3: #9384c2;
+    --lilac: #b794ff;
+    --moon: #ffd27a;
+    --win: #63dcb8;
+    --loss: #ff9db6;
+    --ap: #8fb5ff;
+    --font-display: "M PLUS Rounded 1c", "Segoe UI", system-ui, sans-serif;
+    --font-body: "Figtree", "Segoe UI", system-ui, sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+  }
+  body {
+    background: var(--night);
+    color: var(--ink);
+    font: 400 1rem/1.6 var(--font-body);
+    padding-inline: 16px;
+    padding-block: 0 48px;
+  }
+  .wrap { max-width: 46rem; margin: 0 auto; display: grid; gap: 56px; }
+  h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+  h2 { font-size: 1.5rem; font-weight: 800; }
+  p { margin: 0; }
+  a { color: var(--lilac); }
+  a:focus-visible { outline: 2px solid var(--lilac); outline-offset: 2px; }
+  code { font: 0.85em var(--font-mono); color: var(--ink-2); overflow-wrap: anywhere; }
+  section { display: grid; gap: 20px; }
+  .intro { color: var(--ink-2); max-width: 62ch; }
+
+  /* Hero */
+  .hero {
+    display: flex; gap: 28px; align-items: center; flex-wrap: wrap;
+    padding-block: 56px 8px;
+    background: radial-gradient(28rem 16rem at 8% 40%, rgba(183, 148, 255, 0.14), transparent 70%);
+  }
+  .hero svg { width: 132px; height: 132px; flex: none; }
+  .hero-text { flex: 1 1 18rem; min-width: 0; display: grid; gap: 12px; }
+  .eyebrow { color: var(--moon); font-weight: 600; font-size: 0.95rem; }
+  .hero h1 { font-size: clamp(2.8rem, 9vw, 4rem); font-weight: 800; letter-spacing: -0.01em; }
+  .lede { font-size: 1.15rem; color: var(--ink); max-width: 40ch; }
+  .facts { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .facts li { padding: 3px 12px; border-radius: 999px; background: var(--dusk-2); color: var(--ink-2); font-size: 0.875rem; font-weight: 500; }
+
+  /* Features + overlay replica */
+  .features { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; align-items: start; }
+  .flist { display: grid; gap: 22px; margin: 0; }
+  .flist div { display: grid; gap: 4px; }
+  .flist dt { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
+  .flist dd { margin: 0; color: var(--ink-2); }
+  .tag { font: 600 0.75rem var(--font-body); color: var(--moon); margin-left: 6px; letter-spacing: 0.02em; }
+  figure { margin: 0; display: grid; gap: 10px; }
+  figcaption { font-size: 0.85rem; color: var(--ink-3); }
+
+  .ov {
+    width: 100%; max-width: 284px; box-sizing: border-box;
+    padding: 12px 12px 10px; border-radius: 16px;
+    background: var(--dusk); border: 1px solid rgba(183, 148, 255, 0.35);
+    font: 13px/1.4 var(--font-body); display: grid; gap: 10px;
+  }
+  .ov-head { display: flex; align-items: center; gap: 8px; }
+  .ov-head svg { width: 26px; height: 26px; }
+  .ov-title { font: 800 14px var(--font-display); flex: 1; }
+  .ov-muted { font-size: 11.5px; color: var(--ink-2); }
+  .ov-next { display: grid; gap: 6px; padding: 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); }
+  .ov-row { display: flex; align-items: center; gap: 10px; }
+  .ov-row strong { display: block; font-size: 14px; }
+  .ov-gold { color: var(--moon); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .tile {
+    position: relative; display: inline-grid; place-items: center; flex: none;
+    width: 38px; height: 38px; border-radius: 8px; background: var(--dusk-2); border: 1px solid var(--line);
+    font: 700 11px var(--font-display); color: var(--ink-3);
+  }
+  .tile.big { width: 46px; height: 46px; font-size: 13px; color: var(--ink-2); }
+  .tile.owned { opacity: 0.45; }
+  .tile.owned::after {
+    content: ""; position: absolute; right: -4px; bottom: -4px; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--win) no-repeat center / 10px 10px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.3l3 3 6-6' fill='none' stroke='%2310241d' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+  .ov-path { display: flex; gap: 5px; flex-wrap: wrap; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip { padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 600; }
+  .chip.ap { background: rgba(143, 181, 255, 0.18); color: var(--ap); }
+  .chip.warn { background: rgba(255, 210, 122, 0.16); color: var(--moon); }
+  .chip.danger { background: rgba(255, 125, 159, 0.18); color: var(--loss); }
+
+  /* API table */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.925rem; min-width: 34rem; }
+  th, td { text-align: left; padding: 10px 14px; vertical-align: top; }
+  th { font-weight: 600; color: var(--ink-2); background: var(--dusk); font-size: 0.85rem; }
+  tr + tr td { border-top: 1px solid var(--line); }
+  td:first-child { font-weight: 600; white-space: nowrap; }
+  .opt { color: var(--moon); font-size: 0.8rem; font-weight: 600; }
+
+  ul.plain { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; color: var(--ink-2); max-width: 62ch; }
+  ul.plain strong { color: var(--ink); font-weight: 600; }
+
+  .never { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .never div { padding: 14px 16px; border-radius: 12px; background: var(--dusk); display: grid; gap: 4px; }
+  .never strong { font-weight: 600; }
+  .never span { color: var(--ink-2); font-size: 0.925rem; }
+
+  footer { border-top: 1px solid var(--line); padding-top: 20px; display: grid; gap: 10px; font-size: 0.85rem; color: var(--ink-3); }
+
+  @media (max-width: 720px) {
+    .features { grid-template-columns: minmax(0, 1fr); }
+    .never { grid-template-columns: minmax(0, 1fr); }
+    .hero svg { width: 96px; height: 96px; }
+  }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <svg viewBox="0 0 128 128" role="img" aria-label="Yoru, the night fox mascot">
+      <path d="M84 108 C 108 113 125 96 119 74 C 115 60 101 57 98 67 C 107 78 104 95 83 98 Z" fill="#6c48c9"/>
+      <path d="M119 74 C 115 60 101 57 98 67 C 105 66 113 70 117.5 81 C 118.6 79 119.3 76.6 119 74 Z" fill="#efe6ff"/>
+      <path d="M109 44 L 111 49.5 L 116.5 51.5 L 111 53.5 L 109 59 L 107 53.5 L 101.5 51.5 L 107 49.5 Z" fill="#ffd27a"/>
+      <path d="M46 84 C 40 100 42 116 50 120 L 78 120 C 86 116 88 100 82 84 Z" fill="#8a63e6"/>
+      <path d="M54 86 C 56 98 60 106 64 108 C 68 106 72 98 74 86 Z" fill="#efe6ff"/>
+      <ellipse cx="54" cy="120" rx="8" ry="5" fill="#e4d8ff"/>
+      <ellipse cx="74" cy="120" rx="8" ry="5" fill="#e4d8ff"/>
+      <path d="M36 52 L 38 13 L 62 36 Z" fill="#8a63e6" stroke="#8a63e6" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M92 52 L 90 13 L 66 36 Z" fill="#8a63e6" stroke="#8a63e6" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M41.5 43 L 42.5 23 L 55 35.5 Z" fill="#f3a8d8"/>
+      <path d="M86.5 43 L 85.5 23 L 73 35.5 Z" fill="#f3a8d8"/>
+      <path d="M64 30 C 88 30 102 42 102 58 C 102 63 100 67 97 70 L 104 74 L 93 76 C 86 83 76 87 64 87 C 52 87 42 83 35 76 L 24 74 L 31 70 C 28 67 26 63 26 58 C 26 42 40 30 64 30 Z" fill="#8a63e6"/>
+      <ellipse cx="64" cy="72" rx="17" ry="11" fill="#efe6ff"/>
+      <circle cx="63" cy="42" r="6.2" fill="#ffd27a"/>
+      <circle cx="66.2" cy="40.2" r="5.3" fill="#8a63e6"/>
+      <ellipse cx="49" cy="60" rx="6" ry="7.5" fill="#2b1b4f"/>
+      <ellipse cx="79" cy="60" rx="6" ry="7.5" fill="#2b1b4f"/>
+      <ellipse cx="49" cy="63.5" rx="4" ry="2.8" fill="#9b74ff" opacity=".75"/>
+      <ellipse cx="79" cy="63.5" rx="4" ry="2.8" fill="#9b74ff" opacity=".75"/>
+      <circle cx="51" cy="57" r="2.4" fill="#fff"/>
+      <circle cx="81" cy="57" r="2.4" fill="#fff"/>
+      <circle cx="47.3" cy="62.6" r="1.1" fill="#fff" opacity=".85"/>
+      <circle cx="77.3" cy="62.6" r="1.1" fill="#fff" opacity=".85"/>
+      <ellipse cx="39.5" cy="70" rx="5" ry="2.6" fill="#ff8fc8" opacity=".55"/>
+      <ellipse cx="88.5" cy="70" rx="5" ry="2.6" fill="#ff8fc8" opacity=".55"/>
+      <path d="M61 66.5 Q 64 64.5 67 66.5 Q 64 70 61 66.5 Z" fill="#2b1b4f"/>
+      <path d="M58.5 71 Q 61.25 74.5 64 71 Q 66.75 74.5 69.5 71" fill="none" stroke="#2b1b4f" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+    <div class="hero-text">
+      <p class="eyebrow">League of Legends companion for Windows</p>
+      <h1>Yoru</h1>
+      <p class="lede">Profile overview, team-aware builds and a small in-game item overlay. A personal, non-commercial project that runs locally on my own PC.</p>
+      <ul class="facts">
+        <li>Desktop app (Electron)</li>
+        <li>Interface in German</li>
+        <li>Not publicly distributed</li>
+        <li>No ads, no payments</li>
+      </ul>
+    </div>
+  </header>
+
+  <section aria-labelledby="h-what">
+    <h2 id="h-what">What Yoru does</h2>
+    <div class="features">
+      <dl class="flist">
+        <div>
+          <dt>Profile</dt>
+          <dd>Ranked tier and LP, LP history, champion mastery, recent matches with KDA, CS and items, champion statistics and the players I queue with most. Works for my own Riot ID and for any Riot ID I type in.</dd>
+        </div>
+        <div>
+          <dt>Champion select builds</dt>
+          <dd>When I pick a champion, Yoru suggests runes, summoner spells and items adjusted to the enemy champions that are visible in champion select: healing, shields, tanks, AP/AD split and crowd control. On lock-in it can save the rune page and an item set to my own client.</dd>
+        </div>
+        <div>
+          <dt>In-game overlay</dt>
+          <dd>A small window that shows the next recommended item and how much gold is still missing. It uses only the scoreboard-level data of the official Live Client Data API and can be hidden with a hotkey.</dd>
+        </div>
+        <div>
+          <dt>Build statistics <span class="tag">optional, off by default</span></dt>
+          <dd>Reads ranked Solo/Duo matches of Master+ players in my region and keeps only aggregated numbers per champion, role and patch: win rates of items, rune pages and lane matchups. It pauses while I am in a game.</dd>
+        </div>
+      </dl>
+
+      <figure>
+        <div class="ov" aria-label="Overlay example">
+          <div class="ov-head">
+            <svg viewBox="0 0 128 128" aria-hidden="true"><path d="M36 52 L 38 13 L 62 36 Z M92 52 L 90 13 L 66 36 Z" fill="#8a63e6"/><path d="M64 30 C 88 30 102 42 102 58 C 102 63 100 67 97 70 L 104 74 L 93 76 C 86 83 76 87 64 87 C 52 87 42 83 35 76 L 24 74 L 31 70 C 28 67 26 63 26 58 C 26 42 40 30 64 30 Z" fill="#8a63e6"/><ellipse cx="64" cy="72" rx="17" ry="11" fill="#efe6ff"/><ellipse cx="49" cy="60" rx="6" ry="7.5" fill="#2b1b4f"/><ellipse cx="79" cy="60" rx="6" ry="7.5" fill="#2b1b4f"/><circle cx="63" cy="42" r="6.2" fill="#ffd27a"/><circle cx="66.2" cy="40.2" r="5.3" fill="#8a63e6"/></svg>
+            <span class="ov-title">Ahri</span>
+            <span class="ov-muted">Mid</span>
+          </div>
+          <div class="ov-next">
+            <span class="ov-muted">Nächstes Item</span>
+            <div class="ov-row">
+              <span class="tile big" title="Morellonomicon">Mo</span>
+              <div><strong>Morellonomicon</strong><span class="ov-gold">noch 650 Gold</span></div>
+            </div>
+            <p class="ov-muted">Heilung reduzieren: Soraka, Aatrox</p>
+          </div>
+          <div class="ov-path" aria-label="Build path">
+            <span class="tile owned">Ma</span><span class="tile owned">Za</span><span class="tile">Mo</span><span class="tile">Sc</span><span class="tile">Ra</span><span class="tile">Le</span>
+          </div>
+          <div class="chips">
+            <span class="chip ap">62 % AP / 38 % AD</span>
+            <span class="chip warn">Viel Heilung</span>
+            <span class="chip danger">Burst-Gefahr</span>
+          </div>
+        </div>
+        <figcaption>The in-game overlay with example data. The app's interface is in German.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-api">
+    <h2 id="h-api">How Yoru uses the Riot API</h2>
+    <p class="intro">Every request is made from my own PC with my own key. There is no Yoru server and no shared backend.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>API</th><th>Endpoint</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td>ACCOUNT-V1</td><td><code>/riot/account/v1/accounts/by-riot-id/{gameName}/{tagLine}</code></td><td>Turning a Riot ID into a PUUID when I open a profile</td></tr>
+          <tr><td>SUMMONER-V4</td><td><code>/lol/summoner/v4/summoners/by-puuid/{puuid}</code></td><td>Summoner level and profile icon</td></tr>
+          <tr><td>LEAGUE-V4</td><td><code>/lol/league/v4/entries/by-puuid/{puuid}</code></td><td>Tier, division, LP, wins and losses</td></tr>
+          <tr><td>MATCH-V5</td><td><code>/lol/match/v5/matches/by-puuid/{puuid}/ids</code><br><code>/lol/match/v5/matches/{matchId}</code></td><td>Match history, 20 matches per page</td></tr>
+          <tr><td>CHAMPION-MASTERY-V4</td><td><code>/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid}/top</code></td><td>Top 5 champion masteries on the profile</td></tr>
+          <tr><td>LEAGUE-V4</td><td><code>/lol/league/v4/{challenger|grandmaster|master}leagues/by-queue/RANKED_SOLO_5x5</code></td><td>Player list for the build statistics <span class="opt">optional</span></td></tr>
+          <tr><td>MATCH-V5</td><td><code>/lol/match/v5/matches/{matchId}/timeline</code></td><td>Starting items, item and skill order for the build statistics <span class="opt">optional</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="plain">
+      <li><strong>Rate limits:</strong> a client-side limiter reads the key's limits from the <code>X-App-Rate-Limit</code> response header (currently 20 requests per second, 100 per 2 minutes). Requests I trigger myself go before statistics requests, and <code>Retry-After</code> on 429 responses is respected.</li>
+      <li><strong>Caching:</strong> match details are cached on disk because finished matches never change. Account, rank and league lists are cached in memory for minutes to hours.</li>
+      <li><strong>Key storage:</strong> the key lives only in a local settings file on my PC. It is never part of the source code or of a build.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-local">
+    <h2 id="h-local">Other data sources</h2>
+    <ul class="plain">
+      <li><strong>League Client (LCU):</strong> read through the client's lockfile on the same PC, so no login or password is involved. Used for the current summoner, ranked stats, champion select and saving rune pages and item sets.</li>
+      <li><strong>Live Client Data API</strong> (<code>127.0.0.1:2999</code>): polled every 2 seconds, only while a match is running.</li>
+      <li><strong>Data Dragon:</strong> static champion, item, rune and summoner spell data, cached per patch.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-fair">
+    <h2 id="h-fair">Fair play</h2>
+    <p class="intro">Yoru only shows information a player can already see in the client or on the in-game scoreboard. These features are left out on purpose and will not be added:</p>
+    <div class="never">
+      <div><strong>No timers</strong><span>No enemy ultimate, summoner spell, jungle camp or objective timers.</span></div>
+      <div><strong>No de-anonymizing</strong><span>No revealing of names in champion select and no lobby lookups.</span></div>
+      <div><strong>No game modification</strong><span>No memory reading, code injection or input automation.</span></div>
+      <div><strong>No ads</strong><span>Nothing in the overlay, the client or the app.</span></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-data">
+    <h2 id="h-data">Data and privacy</h2>
+    <ul class="plain">
+      <li>All data stays on my PC: settings, LP snapshots and the aggregated build statistics.</li>
+      <li>The build statistics contain no player names or PUUIDs, only counts per champion, role and patch.</li>
+      <li>Only the current and the previous patch are kept. Older statistics are deleted automatically.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>Yoru 0.1.0 · Personal project for League of Legends on Windows</p>
+    <p>Yoru isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</p>
+  </footer>
+</div>
+</body>
+</html>
